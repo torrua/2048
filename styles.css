@@ -1,0 +1,58 @@
+.score {
+    text-align: center;
+    font-size: xx-large;
+    font-weight: 500;
+    font-family: monospace;
+    
+    border: 4px solid #c9c9c9;
+    border-radius: 6px;
+    
+    width: fit-content;
+    height: fit-content;
+    padding: 10px 15px 10px 15px;
+    margin: 3vh auto 3vh auto;
+}
+
+.board {  /* position */
+    margin: 0 auto;
+    margin-top: 1vw;
+    margin-bottom: 1vw;
+    display: grid;
+    grid-template: '. . . .';
+    grid-gap: 0.5em;
+
+    width: 40vw;
+    height: 40vw;
+    min-width: 250px;
+    min-height: 250px;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+.cell {
+    font-weight: 700;
+    font-family: monospace;
+    color: rgb(255, 255, 255);
+    padding: auto;
+    border-radius: 3px;
+    background-color: #e2e0da;
+    position: relative;
+}
+
+.cell {
+    -webkit-user-select: none;
+    -moz-user-select: none;  
+    -khtml-user-select: none;
+    -webkit-touch-callout: none; 
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.value {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: calc(0.7vmin + 0.7vmax + 20px);
+    transform: translate(-50%, -50%);
+}
