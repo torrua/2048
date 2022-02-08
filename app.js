@@ -6,11 +6,11 @@ const COLORS = {
     "512": "#A82810", "1024": "#7A1735", "2048": "#3B0404", 
 }
 
-const ARROW_STATES = {
-    "ArrowDown": applyArrowDown,
-    "ArrowUp": applyArrowUp,
-    "ArrowLeft": applyArrowLeft,
-    "ArrowRight": applyArrowRight,
+const STATES = {
+    "down": applyArrowDown,
+    "up": applyArrowUp,
+    "left": applyArrowLeft,
+    "right": applyArrowRight,
 }
 
 function setCellObservers() {
@@ -32,7 +32,9 @@ function setCellObservers() {
 
 function setupEmptyTable() {
     score = document.querySelector("#score-value")
-    document.addEventListener("keydown", applyArrow)        
+    document.addEventListener("keydown", applyArrowButton)
+    document.addEventListener('swiped', applyArrowSwipe)
+
     const board = document.querySelector('#board')
 
     for (r = 0; r < GAME_DIMENSION; r++) {
@@ -40,7 +42,7 @@ function setupEmptyTable() {
             let cell = document.createElement('div')
             cell.classList.add('cell')
             cell.innerHTML = `<div class='value'></div>`
-            cell.addEventListener("click", cellClicked)  //TODO Delete
+            // cell.addEventListener("click", cellClicked)  // TODO Delete
             board.append(cell)
         }
     }
@@ -49,17 +51,25 @@ function setupEmptyTable() {
     setCellObservers()
 }
 
-function applyArrow(event) {
-
-    const currentCtate = getState()
-    ARROW_STATES[event.key](currentCtate)
-
-    const newState = getState()
-    if ( JSON.stringify(currentCtate) != JSON.stringify(newState)) { 
-        pushNewNumber() 
-    }
+function applyArrowSwipe(event) {
+    const direction = event.detail.dir.toLowerCase()
+    applyArrowByDirection(direction);
 }
 
+function applyArrowButton(event) {
+    const direction = event.key.substring(5).toLowerCase()
+    applyArrowByDirection(direction);
+}
+
+function applyArrowByDirection(direction) {
+    const currentCtate = getState();
+    STATES[direction](currentCtate);
+
+    const newState = getState();
+    if (JSON.stringify(currentCtate) != JSON.stringify(newState)) {
+        pushNewNumber();
+    }
+}
 
 function pushNewNumber(){
     const values = document.querySelectorAll('.value')
