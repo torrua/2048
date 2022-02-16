@@ -33,7 +33,6 @@ function setCellObservers() {
 
 
 function setupEmptyTable() {
-    score = document.querySelector('#score-value');
     document.addEventListener('keydown', applyArrowButton);
     document.addEventListener('swiped', applyArrowSwipe);
 
@@ -44,14 +43,22 @@ function setupEmptyTable() {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             cell.innerHTML = `<div class='value'></div>`;
-            // cell.addEventListener("click", cellClicked)  // TODO Delete
             board.append(cell);
         }
     }
-
-    setInitialNumbers();
+    startNewGame();
     setCellObservers();
 }
+
+function startNewGame() {
+    const values = document.querySelectorAll('.value');
+    for (let i = 0; i < values.length; i++) {
+        values[i].innerText = '';
+    }
+    setInitialNumbers();
+    document.querySelector('#score-current').innerText = 0;
+}
+
 
 function applyArrowSwipe(event) {
     const direction = event.detail.dir.toLowerCase();
@@ -64,11 +71,10 @@ function applyArrowButton(event) {
 }
 
 function applyArrowByDirection(direction) {
-    const currentCtate = getState();
-    STATES[direction](currentCtate);
-
+    const currentState = getState();
+    STATES[direction]();
     const newState = getState();
-    if (JSON.stringify(currentCtate) != JSON.stringify(newState)) {
+    if (JSON.stringify(currentState) != JSON.stringify(newState)) {
         pushNewNumber();
     }
 }
@@ -106,48 +112,6 @@ function updateCellColor(cell) {
         cell.style.color = 'black' : cell.style.color = 'white';
 }
 
-function calculateRowDirected(row, direction) {
-    /** Пересчитываем строку с учётом направления **/
-    const directedRow = direction === 'left' ? row.reverse() : row;
-    const calculatedRow = calculateRow(directedRow);
-
-    return direction === 'left' ? calculatedRow.reverse() : calculatedRow;
-}
-
-function calculateRow(row) {
-    /** Пересчитываем строку без учёта направления **/
-
-    let sumScore = 0;
-    let filteredRow = row.filter((n) => n);
-
-    if (filteredRow.length > 0) {
-        for (let i = filteredRow.length - 1; i >= 0; i--) {
-            if (filteredRow[i] === filteredRow[i-1]) {
-                filteredRow[i] = filteredRow[i] * 2;
-                sumScore += filteredRow[i];
-                filteredRow[i-1] = null;
-                i--;
-            }
-        }
-
-        addScore(sumScore);
-
-        filteredRow = filteredRow.filter((n) => n);
-        while (filteredRow.length < 4) {
-            filteredRow.unshift('');
-        }
-
-        return filteredRow;
-    }
-    return row;
-}
-
-function addScore(newScore) {
-    const scoreValue = document.querySelector('#score-value');
-    const existingScore = Number(scoreValue.innerText);
-    scoreValue.innerText = existingScore + newScore;
-}
-
 function applyArrowRightLeft(currentState, direction) {
     const newState = [];
     for (let row = 0; row < 4; row++) {
@@ -165,27 +129,80 @@ function applyNewState(newState) {
     }
 }
 
-function applyArrowDown(state) {
+function calculateRowDirected(row, direction) {
+    /** Пересчитываем строку с учётом направления **/
+    const directedRow = direction === 'left' ? row.reverse() : row;
+    const calculatedRow = calculateRow(directedRow);
+    return direction === 'left' ? calculatedRow.reverse() : calculatedRow;
+}
+
+function calculateRow(row) {
+    /** Пересчитываем строку без учёта направления **/
+    let sumCurrentScore = 0;
+    let filteredRow = row.filter((n) => n);
+
+    if (filteredRow.length > 0) {
+        for (let i = filteredRow.length - 1; i >= 0; i--) {
+            if (filteredRow[i] === filteredRow[i-1]) {
+                filteredRow[i] = filteredRow[i] * 2;
+                sumCurrentScore += filteredRow[i];
+                filteredRow[i-1] = null;
+                i--;
+            }
+        }
+
+        updateScoreCurrent(sumCurrentScore);
+        updateScoreBest();
+
+        filteredRow = filteredRow.filter((n) => n);
+        while (filteredRow.length < 4) {
+            filteredRow.unshift('');
+        }
+
+        return filteredRow;
+    }
+    return row;
+}
+
+function applyArrowDown() {
+    const state = getState();
     const stateTransposed = transpose(state);
-    const newState = applyArrowRightLeft(stateTransposed, 'rigth');
+    const newState = applyArrowRightLeft(stateTransposed, 'right');
     applyNewState(transpose(newState));
 }
 
 
-function applyArrowUp(state) {
+function applyArrowUp() {
+    const state = getState();
     const stateTransposed = transpose(state);
     const newState = applyArrowRightLeft(stateTransposed, 'left');
     applyNewState(transpose(newState));
 }
 
-function applyArrowLeft(state) {
+function applyArrowLeft() {
+    const state = getState();
     const newState = applyArrowRightLeft(state, 'left');
     applyNewState(newState);
 }
 
-function applyArrowRight(state) {
-    const newState = applyArrowRightLeft(state, 'rigth');
+function applyArrowRight() {
+    const state = getState();
+    const newState = applyArrowRightLeft(state, 'right');
     applyNewState(newState);
+}
+
+function updateScoreCurrent(newScore) {
+    const scoreValue = document.querySelector('#score-current');
+    const existingScore = Number(scoreValue.innerText);
+    scoreValue.innerText = existingScore + newScore;
+}
+
+function updateScoreBest() {
+    const scoreCurrent = document.querySelector('#score-current');
+    const scoreBest = document.querySelector('#score-best');
+    if (Number(scoreCurrent.innerText) > Number(scoreBest.innerText)) {
+        scoreBest.innerText = scoreCurrent.innerText;
+    }
 }
 
 function getState() {

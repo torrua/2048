@@ -7,12 +7,11 @@
     <meta charset="UTF-8">
 </head>
 <body>
-    <div class="center">
-        <div class="game">
-            <div class="score"><span>Score: </span><span id="score-value">0</span></div>
-            <div class="board" id="board"></div>
-        </div>
+    <div class="game">
+        <div class="scores"><div class="score"><span>Current: </span><span id="score-current">0</span></div><div class="score"><span>Best: </span><span id="score-best">0</span></div></div>
+        <div class="board" id="board"></div>
     </div>
+    <div class="new-game"><button type="button" class="ng" onclick="startNewGame()">New Game</button></div>
     <script src="app.js"></script>
     <script src="swiped-events.min.js"></script>
 </body>
